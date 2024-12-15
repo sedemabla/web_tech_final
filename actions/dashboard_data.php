@@ -27,29 +27,22 @@ try {
     $result = $conn->query($trainingQuery);
     $response['total_training'] = $result->fetch_assoc()['total_training'];
 
-    // Weekly User Signups
-    $weeklySignupsQuery = "
-        SELECT WEEK(created_at) AS week_number, COUNT(*) AS total_users
+    // Hourly User Signups
+    $hourlySignupsQuery = "
+        SELECT DATE_FORMAT(created_at, '%H:00') AS hour, COUNT(*) AS total_users
         FROM pet_users
         WHERE role != 1
-        GROUP BY WEEK(created_at)
-        ORDER BY WEEK(created_at) ASC
+        AND DATE(created_at) = CURDATE() -- Today's date
+        GROUP BY hour
+        ORDER BY hour ASC
     ";
-    $result = $conn->query($weeklySignupsQuery);
-    $response['weekly_signups'] = [];
+    $result = $conn->query($hourlySignupsQuery);
+    $response['hourly_signups'] = [];
     while ($row = $result->fetch_assoc()) {
-        $response['weekly_signups'][] = [
-            'week' => 'Week ' . $row['week_number'],
+        $response['hourly_signups'][] = [
+            'hour' => $row['hour'],
             'total_users' => $row['total_users']
         ];
-    }
-
-    // Recent User Signups
-    $recentUsersQuery = "SELECT username, created_at FROM pet_users ORDER BY created_at DESC LIMIT 5";
-    $result = $conn->query($recentUsersQuery);
-    $response['recent_users'] = [];
-    while ($row = $result->fetch_assoc()) {
-        $response['recent_users'][] = $row;
     }
 
     // Recent Activities (from activities table)

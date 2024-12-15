@@ -196,69 +196,70 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     </div>
 
     <script>
-        fetch('../../actions/dashboard_data.php')
-            .then(response => response.json())
-            .then(data => {
-                // Update stats
-                document.getElementById('total-users').innerText = data.total_users || 0;
-                document.getElementById('total-diy').innerText = data.total_diy || 0;
-                document.getElementById('total-health').innerText = data.total_health || 0;
-                document.getElementById('total-training').innerText = data.total_training || 0;
+    fetch('../../actions/dashboard_data.php')
+        .then(response => response.json())
+        .then(data => {
+            // Update stats
+            document.getElementById('total-users').innerText = data.total_users || 0;
+            document.getElementById('total-diy').innerText = data.total_diy || 0;
+            document.getElementById('total-health').innerText = data.total_health || 0;
+            document.getElementById('total-training').innerText = data.total_training || 0;
 
-                // Populate recent activities
-                const activityTable = document.getElementById('recent-activities');
-                data.recent_activities.forEach(activity => {
-                    const row = `
-                        <tr>
-                            <td>${activity.activity}</td>
-                            <td>${activity.details}</td>
-                            <td>${activity.created_at}</td>
-                        </tr>`;
-                    activityTable.innerHTML += row;
-                });
+            // Populate recent activities
+            const activityTable = document.getElementById('recent-activities');
+            data.recent_activities.forEach(activity => {
+                const row = `
+                    <tr>
+                        <td>${activity.activity}</td>
+                        <td>${activity.details}</td>
+                        <td>${activity.created_at}</td>
+                    </tr>`;
+                activityTable.innerHTML += row;
+            });
 
-                // Weekly User Signups Chart
-                const weeks = data.weekly_signups.map(item => item.week);
-                const userCounts = data.weekly_signups.map(item => item.total_users);
+            // Hourly User Signups Chart
+            const hours = data.hourly_signups.map(item => item.hour);
+            const userCounts = data.hourly_signups.map(item => item.total_users);
 
-                const ctx = document.getElementById('signupChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: weeks,
-                        datasets: [{
-                            label: 'User Signups by Week',
-                            data: userCounts,
-                            borderColor: '#FE979B',
-                            backgroundColor: 'rgba(254, 151, 155, 0.2)',
-                            borderWidth: 2,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#FE979B',
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Weeks'
-                                }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Signups'
-                                }
+            const ctx = document.getElementById('signupChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: hours,
+                    datasets: [{
+                        label: 'Hourly User Signups (Today)',
+                        data: userCounts,
+                        borderColor: '#FE979B',
+                        backgroundColor: 'rgba(254, 151, 155, 0.2)',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#FE979B',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour (24-hour format)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Signups'
                             }
                         }
                     }
-                });
-            })
-            .catch(error => console.error('Error fetching dashboard data:', error));
-    </script>
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching dashboard data:', error));
+</script>
+
 
 
 </body>
