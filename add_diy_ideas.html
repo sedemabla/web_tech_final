@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIY Ideas - Fur & Friends</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f6e8df;
+        }
+        .container {
+            margin: 30px auto;
+            max-width: 900px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #3e3c6e;
+            font-family: 'Fredoka One', cursive;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        label {
+            font-weight: 600;
+            color: #3e3c6e;
+        }
+        input, textarea, button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #fe979b;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #3e3c6e;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #feae97;
+            padding: 10px;
+            text-align: center;
+        }
+        table th {
+            background-color: #fe979b;
+            color: white;
+        }
+        table tr:hover {
+            background-color: #feae97;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add DIY Ideas</h1>
+        <form>
+            <label for="diy-title">DIY Title</label>
+            <input type="text" id="diy-title" name="diy-title" placeholder="Enter title" required>
+
+            <label for="diy-description">Description</label>
+            <textarea id="diy-description" name="diy-description" rows="4" placeholder="Enter DIY project details" required></textarea>
+
+            <label for="diy-materials">Materials</label>
+            <textarea id="diy-materials" name="diy-materials" rows="3" placeholder="List materials required" required></textarea>
+
+            <label for="diy-steps">Steps</label>
+            <textarea id="diy-steps" name="diy-steps" rows="4" placeholder="List step-by-step instructions" required></textarea>
+
+            <label for="diy-image">Upload Image</label>
+            <input type="file" id="diy-image" name="diy-image" accept="image/*">
+
+            <button type="submit">Add DIY Idea</button>
+        </form>
+
+        <h2>Existing DIY Ideas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Materials</th>
+                    <th>Steps</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Homemade Pet Toy</td>
+                    <td>Old T-shirts, Rope</td>
+                    <td>1. Cut t-shirts into strips.<br>2. Braid them tightly.<br>3. Knot the ends.</td>
+                </tr>
+                <tr>
+                    <td>DIY Pet Bed</td>
+                    <td>Old sweater, Stuffing</td>
+                    <td>1. Sew the sweater's openings.<br>2. Fill with stuffing.<br>3. Seal the neck hole.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
