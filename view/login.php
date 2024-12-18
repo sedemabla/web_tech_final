@@ -1,3 +1,6 @@
+<?php
+session_start(); // Start session at the very beginning
+?>
 <?php if (isset($_SESSION['error'])): ?>
     <p class="error" style="display: block;"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
 <?php endif; ?>
@@ -112,6 +115,11 @@
 <body>
     <div class="login-container">
         <h1>Login</h1>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div style="color: red; margin-bottom: 10px; text-align: center;">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
         <form action="../actions/login_user.php" method="POST" onsubmit="return validateLoginForm();">
             <input type="text" id="username" name="username" placeholder="Username" required>
             <input type="password" id="password" name="password" placeholder="Password" required>

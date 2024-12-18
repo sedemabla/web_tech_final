@@ -2,16 +2,14 @@
 session_start();
 require_once '../../db/db.php';
 
-// Ensure admin access only
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     header("Location: ../../view/login.php");
     exit();
 }
 
-// Fetch all DIY ideas
-$query = "SELECT d.*, u.username FROM diy_ideas d 
-          LEFT JOIN users u ON d.created_by = u.user_id 
-          ORDER BY d.created_at DESC";
+$query = "SELECT h.*, u.username FROM health_tips h 
+          LEFT JOIN users u ON h.created_by = u.user_id 
+          ORDER BY h.created_at DESC";
 $result = $conn->query($query);
 ?>
 
@@ -20,7 +18,7 @@ $result = $conn->query($query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage DIY Ideas - Admin Dashboard</title>
+    <title>Manage Health Tips - Admin Dashboard</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
@@ -39,6 +37,7 @@ $result = $conn->query($query);
             font-family: 'Poppins', sans-serif;
             background-color: var(--cream);
         }
+
 
         /* Sidebar */
         .sidebar {
@@ -77,7 +76,6 @@ $result = $conn->query($query);
         .sidebar i {
             font-size: 1.5rem;
         }
-
         /* Main Content */
         .main {
             margin-left: 250px;
@@ -93,7 +91,7 @@ $result = $conn->query($query);
             color: var(--dark-blue);
         }
 
-        /* DIY Table */
+        /* Health Tips Table */
         table {
             width: 100%;
             margin-top: 20px;
@@ -143,66 +141,37 @@ $result = $conn->query($query);
             opacity: 0.8;
         }
 
-        /* Add DIY Section */
-        .add-diy {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: var(--white);
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .add-diy h2 {
-            margin-bottom: 15px;
-            color: var(--dark-blue);
-        }
-
-        .add-diy form input, 
-        .add-diy form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--peach);
-            border-radius: 5px;
-        }
-
-        .add-diy form button {
-            background-color: var(--pink);
-            color: var(--white);
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .add-diy form button:hover {
-            background-color: var(--dark-blue);
-        }
-
-        .diy-grid {
+        .health-tip-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             padding: 20px;
         }
-        .diy-card {
+
+        .health-tip-card {
             background: var(--white);
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .diy-image {
+
+        .health-tip-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
             border-radius: 4px;
         }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: 250px; /* Match sidebar width */
+            flex: 1;
+            padding: 20px;
+            background-color: var(--light-pink);
+            min-height: 100vh;
         }
 
+        /* Modal Styles */ 
         .modal {
             display: none;
             position: fixed;
@@ -212,21 +181,22 @@ $result = $conn->query($query);
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background-color: var(--white);
             padding: 20px;
             border-radius: 8px;
             width: 90%;
             max-width: 500px;
-            position: relative;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        /* Form Styles */
         .form-group {
             margin-bottom: 15px;
         }
@@ -239,7 +209,8 @@ $result = $conn->query($query);
         }
 
         .form-group input[type="text"],
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -252,12 +223,14 @@ $result = $conn->query($query);
             resize: vertical;
         }
 
+        /* Button Styles */
         .modal button {
             padding: 8px 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin-right: 10px;
+            font-family: 'Poppins', sans-serif;
         }
 
         .modal button[type="submit"] {
@@ -269,6 +242,26 @@ $result = $conn->query($query);
             background-color: #ddd;
         }
 
+        /* Grid Layout */
+        .health-tip-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Display Properties Fix */
+        .modal[style="display: none;"] {
+            display: none !important;
+        }
+
+        .modal[style="display: block;"] {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Add Button Style */
         .add-btn {
             background-color: var(--peach);
             color: var(--white);
@@ -277,15 +270,7 @@ $result = $conn->query($query);
             border-radius: 4px;
             cursor: pointer;
             margin-bottom: 20px;
-        }
-
-        /* Fix display property override */
-        .modal[style="display: none;"] {
-            display: none !important;
-        }
-
-        .modal[style="display: block;"] {
-            display: flex !important;
+            font-family: 'Poppins', sans-serif;
         }
     </style>
 </head>
@@ -293,20 +278,28 @@ $result = $conn->query($query);
     <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
-        <h1>Manage DIY Ideas</h1>
+        <h1>Manage Health Tips</h1>
         
-        <button onclick="showAddForm()" class="add-btn">Add New DIY Idea</button>
+        <button onclick="showAddForm()" class="add-btn">Add New Health Tip</button>
 
-        <div class="diy-grid">
-            <?php while ($diy = $result->fetch_assoc()): ?>
-                <div class="diy-card">
-    <?php $image_url = !empty($diy['image_path']) ? "../../" . $diy['image_path'] : "../../assets/images/placeholder.jpg";?>
-    <img src="<?= htmlspecialchars($image_url) ?>" alt="<?= htmlspecialchars($diy['title']) ?>" class="diy-image" onerror="this.src='../../assets/images/placeholder.jpg'">
-                    <h3><?= htmlspecialchars($diy['title']) ?></h3>
-                    <p><?= htmlspecialchars(substr($diy['description'], 0, 100)) ?>...</p>
+        <div class="health-tip-grid">
+            <?php while ($tip = $result->fetch_assoc()): ?>
+                <div class="health-tip-card">
+                    <?php 
+                        $image_url = !empty($tip['image_path']) ? 
+                            "../../" . $tip['image_path'] : 
+                            "../../assets/images/placeholder.jpg";
+                    ?>
+                    <img src="<?= htmlspecialchars($image_url) ?>" 
+                         alt="<?= htmlspecialchars($tip['title']) ?>" 
+                         class="health-tip-image" 
+                         onerror="this.src='../../assets/images/placeholder.jpg'">
+                    <h3><?= htmlspecialchars($tip['title']) ?></h3>
+                    <p><?= htmlspecialchars(substr($tip['description'], 0, 100)) ?>...</p>
+                    <p><strong>Category:</strong> <?= htmlspecialchars($tip['category']) ?></p>
                     <div class="action-buttons">
-                        <button onclick="editDiy(<?= $diy['diy_id'] ?>)" class="edit-btn">Edit</button>
-                        <button onclick="deleteDiy(<?= $diy['diy_id'] ?>)" class="delete-btn">Delete</button>
+                        <button onclick="editTip(<?= $tip['tip_id'] ?>)" class="edit-btn">Edit</button>
+                        <button onclick="deleteTip(<?= $tip['tip_id'] ?>)" class="delete-btn">Delete</button>
                     </div>
                 </div>
             <?php endwhile; ?>
@@ -314,15 +307,26 @@ $result = $conn->query($query);
     </div>
 
     <!-- Add/Edit Modal -->
-    <div id="diyModal" class="modal" style="display: none;">
+    <div id="healthTipModal" class="modal">
         <div class="modal-content">
-            <form id="diyForm" action="../../actions/admin/manage_diy.php" method="POST" enctype="multipart/form-data">
+            <form id="healthTipForm" action="../../actions/admin/manage_health_tips.php" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add">
-                <input type="hidden" name="diy_id" id="diy_id">
+                <input type="hidden" name="tip_id" id="tip_id">
                 
                 <div class="form-group">
                     <label>Title</label>
                     <input type="text" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="Nutrition">Nutrition</option>
+                        <option value="Exercise">Exercise</option>
+                        <option value="Grooming">Grooming</option>
+                        <option value="Medical">Medical</option>
+                        <option value="Mental Health">Mental Health</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
@@ -343,30 +347,30 @@ $result = $conn->query($query);
 
     <script>
         function showAddForm() {
-            document.getElementById('diyModal').style.display = 'block';
-            document.getElementById('diyForm').reset();
+            document.getElementById('healthTipModal').style.display = 'block';
+            document.getElementById('healthTipForm').reset();
         }
 
         function closeModal() {
-            document.getElementById('diyModal').style.display = 'none';
+            document.getElementById('healthTipModal').style.display = 'none';
         }
 
-        function editDiy(id) {
-            // Fetch DIY details and populate form
-            fetch(`../../actions/admin/manage_diy.php?action=get&diy_id=${id}`)
+        function editTip(id) {
+            fetch(`../../actions/admin/manage_health_tips.php?action=get&tip_id=${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('diy_id').value = data.diy_id;
-                    document.getElementById('diyForm').elements['title'].value = data.title;
-                    document.getElementById('diyForm').elements['description'].value = data.description;
-                    document.getElementById('diyForm').elements['action'].value = 'edit';
-                    document.getElementById('diyModal').style.display = 'block';
+                    document.getElementById('tip_id').value = data.tip_id;
+                    document.getElementById('healthTipForm').elements['title'].value = data.title;
+                    document.getElementById('healthTipForm').elements['category'].value = data.category;
+                    document.getElementById('healthTipForm').elements['description'].value = data.description;
+                    document.getElementById('healthTipForm').elements['action'].value = 'edit';
+                    document.getElementById('healthTipModal').style.display = 'block';
                 });
         }
 
-        function deleteDiy(id) {
-            if (confirm('Are you sure you want to delete this DIY idea?')) {
-                window.location.href = `../../actions/admin/manage_diy.php?action=delete&diy_id=${id}`;
+        function deleteTip(id) {
+            if (confirm('Are you sure you want to delete this health tip?')) {
+                window.location.href = `../../actions/admin/manage_health_tips.php?action=delete&tip_id=${id}`;
             }
         }
     </script>

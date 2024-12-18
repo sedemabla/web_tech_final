@@ -194,11 +194,11 @@ session_start(); // Start session for managing user authentication
 
     <nav>
         <a href="index.php">Home</a>
-        <a href="tips.php">Tips & Training</a>
-        <a href="diy.php">DIY Ideas</a>
-        <a href="health.php">Health Tips</a>
-        <a href="about.php">About Us</a>
-        <a href="contact.php">Contact</a>
+        <a href="view/training_tips.php">Tips & Training</a>
+        <a href="view/diy_ideas.php">DIY Ideas</a>
+        <a href="view/health_tips.php">Health Tips</a>
+        <a href="view/about.php">About Us</a>
+        <a href="view/contact.php">Contact</a>
     </nav>
 
     <div class="hero">

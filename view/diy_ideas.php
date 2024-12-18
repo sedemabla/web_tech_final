@@ -1,9 +1,17 @@
+<?php
+session_start();
+require_once '../db/db.php';
+
+// Fetch DIY ideas from the database
+$query = "SELECT * FROM diy_ideas";
+$result = $conn->query($query);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Training Tips - Fur & Friends</title>
+    <title>DIY Ideas - Fur & Friends</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
@@ -12,6 +20,7 @@
             margin: 0;
             background-color: #f6e8df;
         }
+        /* Banner */
         .banner {
             background-color: #3e3c6e;
             color: white;
@@ -57,7 +66,7 @@
         .add-btn:hover {
             background-color: #3e3c6e;
         }
-        .tip-card {
+        .diy-card {
             display: flex;
             gap: 20px;
             align-items: center;
@@ -67,13 +76,13 @@
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .tip-card img {
+        .diy-card img {
             width: 150px;
             height: 150px;
             border-radius: 10px;
             object-fit: cover;
         }
-        .tip-card h3 {
+        .diy-card h3 {
             margin: 0;
             color: #3e3c6e;
         }
@@ -88,39 +97,46 @@
     <div class="banner">
         <h1>Fur & Friends</h1>
         <nav>
-            <a href="home.html">Home</a>
-            <a href="training_tips.html">Training Tips</a>
-            <a href="diy_ideas.html">DIY Ideas</a>
-            <a href="health_tips.html">Health Tips</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
+            <a href="index.php">Home</a>
+            <a href="training_tips.php">Tips & Training</a>
+            <a href="diy_ideas.php">DIY Ideas</a>
+            <a href="health_tips.php">Health Tips</a>
+            <a href="about.php">About Us</a>
+            <a href="contact.php">Contact</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content-container">
-        <h2>Training Tips</h2>
-        <a href="add_training_tips.html" class="add-btn">+ Add Your Own Training Tip</a>
+        <h2>DIY Ideas</h2>
 
-        <!-- Training Tip Cards -->
-        <a href="training_tips_details.html">
-            <div class="tip-card">
-                <img src="https://via.placeholder.com/150" alt="Training Image">
-                <div>
-                    <h3>Leash Training</h3>
-                    <p>How to train your dog to walk on a leash without pulling.</p>
+        <!-- Add DIY Button -->
+        <a href="add_diy_ideas.php" class="add-btn">+ Add Your Own DIY Idea</a>
+
+        <!-- Display success or error messages -->
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+        <?php endif; ?>
+
+        <!-- DIY Ideas List -->
+        <?php if ($result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <div class="diy-card">
+                    <?php if (!empty($row['image_url'])): ?>
+                        <img src="../assets/<?= htmlspecialchars($row['image_url']); ?>" alt="<?= htmlspecialchars($row['title']); ?>">
+                    <?php endif; ?>
+                    <div>
+                        <h3><?= htmlspecialchars($row['title']); ?></h3>
+                        <p><?= htmlspecialchars($row['description']); ?></p>
+                    </div>
                 </div>
-            </div>
-        </a>
-        <a href="training_tips_details.html">
-            <div class="tip-card">
-                <img src="https://via.placeholder.com/150" alt="Training Image">
-                <div>
-                    <h3>Basic Commands</h3>
-                    <p>Teach your dog basic commands like sit, stay, and come.</p>
-                </div>
-            </div>
-        </a>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p>No DIY ideas available. Be the first to add one!</p>
+        <?php endif; ?>
     </div>
 </body>
 </html>

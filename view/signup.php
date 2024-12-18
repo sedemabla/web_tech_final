@@ -146,8 +146,6 @@ session_start(); // Start a session to manage flash messages and other session d
         <?php endif; ?>
 
         <form action="../actions/signup_user.php" method="POST">
-            <input type="text" id="firstName" name="first_name" placeholder="First Name" required>
-            <input type="text" id="lastName" name="last_name" placeholder="Surname" required>
             <input type="text" id="username" name="username" placeholder="Username" required>
             <input type="email" id="email" name="email" placeholder="Email" required>
             <input type="password" id="password" name="password" placeholder="Password" required>

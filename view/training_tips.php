@@ -1,9 +1,17 @@
+<?php
+// Include Database Connection
+include('../db/db.php');
+// Fetch Training Tips from the Database
+$sql = "SELECT * FROM pet_training_tips"; // Assuming 'training_tips' is your table name
+$result = $conn->query($sql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIY Ideas - Fur & Friends</title>
+    <title>Training Tips - Fur & Friends</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
@@ -12,14 +20,13 @@
             margin: 0;
             background-color: #f6e8df;
         }
-        /* Banner */
-        .banner {
+        .banner { 
             background-color: #3e3c6e;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 10px 20px; 
         }
         .banner h1 {
             margin: 0;
@@ -58,7 +65,7 @@
         .add-btn:hover {
             background-color: #3e3c6e;
         }
-        .diy-card {
+        .tip-card {
             display: flex;
             gap: 20px;
             align-items: center;
@@ -68,13 +75,13 @@
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .diy-card img {
+        .tip-card img {
             width: 150px;
             height: 150px;
             border-radius: 10px;
             object-fit: cover;
         }
-        .diy-card h3 {
+        .tip-card h3 {
             margin: 0;
             color: #3e3c6e;
         }
@@ -89,41 +96,36 @@
     <div class="banner">
         <h1>Fur & Friends</h1>
         <nav>
-            <a href="home.html">Home</a>
-            <a href="tips_training.html">Tips & Training</a>
-            <a href="diy_ideas.html">DIY Ideas</a>
-            <a href="health_tips.html">Health Tips</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
+            <a href="index.php">Home</a>
+            <a href="training_tips.php">Training Tips</a>
+            <a href="diy_ideas.php">DIY Ideas</a>
+            <a href="health_tips.php">Health Tips</a>
+            <a href="about.php">About Us</a>
+            <a href="contact.php">Contact</a>
         </nav>
     </div>
 
     <!-- Content -->
     <div class="content-container">
-        <h2>DIY Ideas</h2>
+        <h2>Training Tips</h2>
+        <a href="add_training_tips.php" class="add-btn">+ Add Your Own Training Tip</a>
 
-        <!-- Add DIY Button -->
-        <a href="add_diy_ideas.html" class="add-btn">+ Add Your Own DIY Idea</a>
-
-        <!-- DIY Ideas List -->
-        <a href="diy_idea_details.html">
-            <div class="diy-card">
-                <img src="https://via.placeholder.com/150" alt="DIY Image">
-                <div>
-                    <h3>DIY Pet Toy</h3>
-                    <p>Easy homemade toy for pets using old t-shirts.</p>
-                </div>
-            </div>
-        </a>
-        <a href="diy_idea_details.html">
-            <div class="diy-card">
-                <img src="https://via.placeholder.com/150" alt="DIY Image">
-                <div>
-                    <h3>Homemade Pet Food</h3>
-                    <p>Simple nutritious food recipes for pets.</p>
-                </div>
-            </div>
-        </a>
+        <!-- Training Tip Cards -->
+        <?php if ($result->num_rows > 0): ?>
+            <?php while ($row = $result->fetch_assoc()): ?>
+                <a href="training_tips_details.php?id=<?= $row['id'] ?>">
+                    <div class="tip-card">
+                        <img src="<?= htmlspecialchars($row['image_url']) ?>" alt="Training Tip">
+                        <div>
+                            <h3><?= htmlspecialchars($row['title']) ?></h3>
+                            <p><?= htmlspecialchars($row['description']) ?></p>
+                        </div>
+                    </div>
+                </a>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p>No training tips available. Be the first to add one!</p>
+        <?php endif; ?>
     </div>
 </body>
 </html>

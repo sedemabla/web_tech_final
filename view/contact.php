@@ -180,7 +180,7 @@ session_start(); // Start session for user login management
 
     <!-- Hero Section with a Big Image -->
     <section class="hero">
-        <img src="assets/contact.jpg" alt="Get in Touch Image">
+        <img src="../assets/contact.jpg" alt="Get in Touch Image">
         <div class="hero-text">
             <h2>Get in Touch</h2>
             <p>Want to get in touch? We’d love to hear from you. Here’s how you can reach us.</p>

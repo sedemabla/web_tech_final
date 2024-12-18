@@ -196,71 +196,69 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
     </div>
 
     <script>
-    fetch('../../actions/dashboard_data.php')
-        .then(response => response.json())
-        .then(data => {
-            // Update stats
-            document.getElementById('total-users').innerText = data.total_users || 0;
-            document.getElementById('total-diy').innerText = data.total_diy || 0;
-            document.getElementById('total-health').innerText = data.total_health || 0;
-            document.getElementById('total-training').innerText = data.total_training || 0;
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('../../actions/dashboard_data.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Error:', data.error);
+                    return;
+                }
 
-            // Populate recent activities
-            const activityTable = document.getElementById('recent-activities');
-            data.recent_activities.forEach(activity => {
-                const row = `
-                    <tr>
-                        <td>${activity.activity}</td>
-                        <td>${activity.details}</td>
-                        <td>${activity.created_at}</td>
-                    </tr>`;
-                activityTable.innerHTML += row;
-            });
+                // Update statistics
+                document.getElementById('total-users').textContent = data.total_users || '0';
+                document.getElementById('total-diy').textContent = data.total_diy || '0';
+                document.getElementById('total-health').textContent = data.total_health || '0';
+                document.getElementById('total-training').textContent = data.total_training || '0';
 
-            // Hourly User Signups Chart
-            const hours = data.hourly_signups.map(item => item.hour);
-            const userCounts = data.hourly_signups.map(item => item.total_users);
+                // Update activities table
+                const tbody = document.getElementById('recent-activities');
+                tbody.innerHTML = ''; // Clear existing content
+                data.recent_activities.forEach(activity => {
+                    const row = `
+                        <tr>
+                            <td>${activity.activity}</td>
+                            <td>${activity.details}</td>
+                            <td>${new Date(activity.created_at).toLocaleString()}</td>
+                        </tr>`;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                });
 
-            const ctx = document.getElementById('signupChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: hours,
-                    datasets: [{
-                        label: 'Hourly User Signups (Today)',
-                        data: userCounts,
-                        borderColor: '#FE979B',
-                        backgroundColor: 'rgba(254, 151, 155, 0.2)',
-                        borderWidth: 2,
-                        pointRadius: 5,
-                        pointBackgroundColor: '#FE979B',
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Hour (24-hour format)'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Signups'
+                // Update chart
+                const ctx = document.getElementById('signupChart').getContext('2d');
+                const hours = data.hourly_signups.map(item => item.hour);
+                const counts = data.hourly_signups.map(item => item.total_users);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: hours,
+                        datasets: [{
+                            label: 'User Signups Today',
+                            data: counts,
+                            borderColor: '#FE979B',
+                            backgroundColor: 'rgba(254, 151, 155, 0.2)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
                             }
                         }
                     }
-                }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching dashboard data:', error);
             });
-        })
-        .catch(error => console.error('Error fetching dashboard data:', error));
-</script>
-
-
-
+    });
+    </script>
 </body>
 </html>

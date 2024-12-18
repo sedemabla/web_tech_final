@@ -1,269 +1,81 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1deb3
--- https://www.phpmyadmin.net/
---
--- Host: localhost:3306
--- Generation Time: Dec 15, 2024 at 05:03 PM
--- Server version: 8.0.40-0ubuntu0.24.04.1
--- PHP Version: 8.3.6
+-- Table: Users
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    profile_image VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+-- Table: Training Tips
+CREATE TABLE training_tips (
+    tip_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    image_url VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
+-- Table: DIY Ideas
+CREATE TABLE diy_ideas (
+    idea_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    image_url VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+-- Table: Health Tips
+CREATE TABLE health_tips (
+    tip_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    image_url VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
---
--- Database: `webtech_fall2024_sedem_agudetse`
---
+-- Table: Comments
+CREATE TABLE comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    content_type ENUM('training_tip', 'diy_idea', 'health_tip') NOT NULL,
+    content_id INT NOT NULL,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
--- --------------------------------------------------------
+-- Table: Favorites
+CREATE TABLE favorites (
+    favorite_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    content_type ENUM('training_tip', 'diy_idea', 'health_tip') NOT NULL,
+    content_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
 
---
--- Table structure for table `activities`
---
+-- Table: Admins
+CREATE TABLE admins (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-CREATE TABLE `activities` (
-  `id` int NOT NULL,
-  `activity` varchar(255) DEFAULT NULL,
-  `details` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_categories`
---
-
-CREATE TABLE `pet_categories` (
-  `category_id` int NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `description` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_diy_projects`
---
-
-CREATE TABLE `pet_diy_projects` (
-  `diy_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `materials` text NOT NULL,
-  `steps` text NOT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_health_tips`
---
-
-CREATE TABLE `pet_health_tips` (
-  `health_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `health_category` enum('Nutrition','Exercise','Medical Care') NOT NULL,
-  `image_url` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_media`
---
-
-CREATE TABLE `pet_media` (
-  `media_id` int NOT NULL,
-  `post_type` enum('DIY','Training','Health') NOT NULL,
-  `post_id` int NOT NULL,
-  `media_url` varchar(255) NOT NULL,
-  `uploaded_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_training_tips`
---
-
-CREATE TABLE `pet_training_tips` (
-  `training_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text NOT NULL,
-  `techniques` text NOT NULL,
-  `difficulty_level` enum('Beginner','Intermediate','Advanced') DEFAULT 'Beginner',
-  `image_url` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pet_users`
---
-
-CREATE TABLE `pet_users` (
-  `user_id` int NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `role` tinyint(1) NOT NULL DEFAULT '2'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Dumping data for table `pet_users`
---
-
-INSERT INTO `pet_users` (`user_id`, `first_name`, `last_name`, `username`, `email`, `password`, `created_at`, `role`) VALUES
-(1, 'Zeph', 'Cabrera', 'dizujygemu', 'jala@mailinator.com', '$2y$10$Xu7NU.jaIHW1DzJ5w5kiwu8e/mOKqc81s7luqGFg1UGDV9B40V8cm', '2024-12-15 16:09:03', 2),
-(2, 'Noel', 'Sparks', 'pizoloc', 'goryvyzuf@mailinator.com', '$2y$10$wHRwu7n3Q/wDoTGIHIqyqexD0oUtMXJxJKveH0b1YH/tdwiCxbImS', '2024-12-15 16:28:40', 1),
-(3, 'TaShya', 'Mcbride', 'qykok', 'lohofax@mailinator.com', '$2y$10$EADUTaXdbrrSwDkpFRzdcexu.NszAHgiFzlMjaGd9aT820XAkG.bK', '2024-12-15 16:49:01', 2);
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `activities`
---
-ALTER TABLE `activities`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `pet_categories`
---
-ALTER TABLE `pet_categories`
-  ADD PRIMARY KEY (`category_id`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `pet_diy_projects`
---
-ALTER TABLE `pet_diy_projects`
-  ADD PRIMARY KEY (`diy_id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `pet_health_tips`
---
-ALTER TABLE `pet_health_tips`
-  ADD PRIMARY KEY (`health_id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `pet_media`
---
-ALTER TABLE `pet_media`
-  ADD PRIMARY KEY (`media_id`),
-  ADD KEY `post_id` (`post_id`);
-
---
--- Indexes for table `pet_training_tips`
---
-ALTER TABLE `pet_training_tips`
-  ADD PRIMARY KEY (`training_id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `pet_users`
---
-ALTER TABLE `pet_users`
-  ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `activities`
---
-ALTER TABLE `activities`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_categories`
---
-ALTER TABLE `pet_categories`
-  MODIFY `category_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_diy_projects`
---
-ALTER TABLE `pet_diy_projects`
-  MODIFY `diy_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_health_tips`
---
-ALTER TABLE `pet_health_tips`
-  MODIFY `health_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_media`
---
-ALTER TABLE `pet_media`
-  MODIFY `media_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_training_tips`
---
-ALTER TABLE `pet_training_tips`
-  MODIFY `training_id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `pet_users`
---
-ALTER TABLE `pet_users`
-  MODIFY `user_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `pet_diy_projects`
---
-ALTER TABLE `pet_diy_projects`
-  ADD CONSTRAINT `pet_diy_projects_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `pet_users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `pet_health_tips`
---
-ALTER TABLE `pet_health_tips`
-  ADD CONSTRAINT `pet_health_tips_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `pet_users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `pet_media`
---
-ALTER TABLE `pet_media`
-  ADD CONSTRAINT `pet_media_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `pet_diy_projects` (`diy_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `pet_training_tips`
---
-ALTER TABLE `pet_training_tips`
-  ADD CONSTRAINT `pet_training_tips_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `pet_users` (`user_id`) ON DELETE CASCADE;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+-- Table: Activity Logs
+CREATE TABLE activity_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    admin_id INT,
+    action VARCHAR(255) NOT NULL,
+    log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (admin_id) REFERENCES admins(admin_id) ON DELETE SET NULL
+);
