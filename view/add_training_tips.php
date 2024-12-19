@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,12 +71,12 @@
 <body>
     <div class="container">
         <h1>Add Training Tips</h1>
-        <form>
+        <form action="../actions/add_user_training_tip.php" method="POST" enctype="multipart/form-data">
             <label for="training-title">Training Title</label>
-            <input type="text" id="training-title" name="training-title" placeholder="Enter training title" required>
+            <input type="text" id="training-title" name="title" placeholder="Enter training title" required>
 
             <label for="training-description">Description</label>
-            <textarea id="training-description" name="training-description" rows="4" placeholder="Enter training tip details" required></textarea>
+            <textarea id="training-description" name="description" rows="4" placeholder="Enter training tip details" required></textarea>
 
             <label for="difficulty">Difficulty Level</label>
             <select id="difficulty" name="difficulty">
@@ -85,7 +86,7 @@
             </select>
 
             <label for="training-image">Upload Image</label>
-            <input type="file" id="training-image" name="training-image" accept="image/*">
+            <input type="file" id="training-image" name="image" accept="image/*">
 
             <button type="submit">Add Training Tip</button>
         </form>

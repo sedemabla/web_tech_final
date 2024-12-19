@@ -163,12 +163,12 @@
             <div class="content-card">
                 <h3>Basic Obedience</h3>
                 <p>Start training your pet with simple commands...</p>
-                <a href="training_tips_details.html">View Details</a>
+                <a href="training_tip_details.php">View Details</a>
             </div>
             <div class="content-card">
                 <h3>Leash Training</h3>
                 <p>Teach your pet to walk properly on a leash...</p>
-                <a href="training_tips_details.html">View Details</a>
+                <a href="training_tip_details.php">View Details</a>
             </div>
         </div>
     </div>

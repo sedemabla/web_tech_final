@@ -1,113 +1,117 @@
+<?php
+session_start();
+require_once '../db/db.php';
+
+if (!isset($_GET['id'])) {
+    header('Location: diy_ideas.php');
+    exit();
+}
+
+$idea_id = (int)$_GET['id'];
+$stmt = $conn->prepare("SELECT d.*, u.username,
+                       COUNT(DISTINCT c.comment_id) as comment_count
+                       FROM diy_ideas d
+                       LEFT JOIN users u ON d.user_id = u.user_id
+                       LEFT JOIN comments c ON d.idea_id = c.content_id 
+                       AND c.content_type = 'diy_idea'
+                       WHERE d.idea_id = ?
+                       GROUP BY d.idea_id");
+$stmt->bind_param("i", $idea_id);
+$stmt->execute();
+$idea = $stmt->get_result()->fetch_assoc();
+
+if (!$idea) {
+    header('Location: diy_ideas.php');
+    exit();
+}
+
+// Get comments
+$stmt = $conn->prepare("SELECT c.*, u.username 
+                       FROM comments c 
+                       JOIN users u ON c.user_id = u.user_id 
+                       WHERE c.content_id = ? AND c.content_type = 'diy_idea'
+                       ORDER BY c.created_at DESC");
+$stmt->bind_param("i", $idea_id);
+$stmt->execute();
+$comments = $stmt->get_result();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIY Idea Details - Fur & Friends</title>
+    <title><?= htmlspecialchars($idea['title']) ?> - DIY Idea</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            background-color: #f6e8df;
+        
+        :root {
+            --dark-blue: #3E3C6E;
+            --pink: #FE979B;
+            --peach: #FEAE97;
+            --light-pink: #F6E8DF;
+            --white: #FFFFFF;
         }
-        /* Banner */
-        .banner {
-            background-color: #3e3c6e;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-        }
-        .banner h1 {
-            margin: 0;
-            font-family: 'Fredoka One', cursive;
-        }
-        .banner nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            font-weight: 600;
-        }
-        .banner nav a:hover {
-            color: #feae97;
-        }
-        .back-button {
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .back-button i {
-            margin-right: 5px;
-        }
-        .container {
-            margin: 20px auto;
-            max-width: 800px;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            color: #3e3c6e;
-            font-family: 'Fredoka One', cursive;
-            text-align: center;
-        }
-        .diy-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-        .section-title {
-            color: #3e3c6e;
-            margin-top: 20px;
-        }
-        p, ul {
-            color: #555;
-        }
+
+        /* Use same styles as training_tip_details.php */
+        /* ...existing styles from training_tip_details.php... */
     </style>
 </head>
 <body>
-    <!-- Banner -->
-    <div class="banner">
-        <a href="diy_ideas.html" class="back-button"><i class='bx bx-arrow-back'></i>Back</a>
+    <!-- Header -->
+    <div class="header">
+        <a href="diy_ideas.php" class="back-button">
+            <i class='bx bx-arrow-back'></i>
+            Back to DIY Ideas
+        </a>
         <h1>Fur & Friends</h1>
         <nav>
-            <a href="home.html">Home</a>
-            <a href="training_tips.html">Training Tips</a>
-            <a href="diy_ideas.html">DIY Ideas</a>
-            <a href="health_tips.html">Health Tips</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
+            <a href="../index.php">Home</a>
+            <a href="training_tips.php">Training Tips</a>
+            <a href="health_tips.php">Health Tips</a>
+            <a href="about.php">About Us</a>
         </nav>
     </div>
 
-    <!-- DIY Details -->
     <div class="container">
-        <h2>DIY Pet Toy</h2>
-        <img src="https://via.placeholder.com/600x300" alt="DIY Toy Image" class="diy-image">
-        <div>
-            <h3 class="section-title">Description</h3>
-            <p>Create an engaging toy for your pets using old t-shirts. This DIY is simple and requires no sewing!</p>
+        <div class="tip-content">
+            <?php if (!empty($idea['image_url'])): ?>
+                <img src="../uploads/diy/<?= htmlspecialchars($idea['image_url']) ?>" 
+                     alt="<?= htmlspecialchars($idea['title']) ?>" 
+                     class="tip-image"
+                     onerror="this.src='../assets/images/placeholder.jpg'">
+            <?php endif; ?>
 
-            <h3 class="section-title">Materials</h3>
-            <ul>
-                <li>Old t-shirts</li>
-                <li>Scissors</li>
-                <li>Rubber bands</li>
-            </ul>
+            <h1 class="tip-title"><?= htmlspecialchars($idea['title']) ?></h1>
+            <p><strong>Created by:</strong> <?= htmlspecialchars($idea['username']) ?></p>
+            
+            <div class="tip-description">
+                <?= nl2br(htmlspecialchars($idea['description'])) ?>
+            </div>
+        </div>
 
-            <h3 class="section-title">Steps</h3>
-            <ol>
-                <li>Cut the t-shirts into long strips.</li>
-                <li>Gather the strips together and tie a knot in the middle.</li>
-                <li>Braid the strips on either side of the knot.</li>
-                <li>Tie knots at both ends to secure the braids.</li>
-                <li>Trim any excess fabric and let your pet enjoy the new toy!</li>
-            </ol>
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h2>Comments</h2>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <form class="comment-form" action="../actions/add_comment.php" method="POST">
+                    <input type="hidden" name="content_type" value="diy_idea">
+                    <input type="hidden" name="content_id" value="<?= $idea_id ?>">
+                    <div>
+                        <label>Comment:</label>
+                        <textarea name="comment" required></textarea>
+                    </div>
+                    <button type="submit">Add Comment</button>
+                </form>
+            <?php endif; ?>
+
+            <?php while ($comment = $comments->fetch_assoc()): ?>
+                <div class="comment">
+                    <p><?= htmlspecialchars($comment['comment_text']) ?></p>
+                    <small>By <?= htmlspecialchars($comment['username']) ?> on 
+                        <?= date('M d, Y', strtotime($comment['created_at'])) ?></small>
+                </div>
+            <?php endwhile; ?>
         </div>
     </div>
 </body>

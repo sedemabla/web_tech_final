@@ -14,12 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $stmt = $conn->prepare("INSERT INTO training_comments (tip_id, user_id, comment, rating) VALUES (?, ?, ?, ?)");
     $stmt->bind_param("iisi", $tip_id, $_SESSION['user_id'], $comment, $rating);
-    
+        
     if ($stmt->execute()) {
-        header("Location: ../view/training_tips_details.php?id=$tip_id");
+        header("Location: ../view/training_tip_details.php?id=$tip_id");
     } else {
         $_SESSION['error'] = "Error adding comment";
-        header("Location: ../view/training_tips_details.php?id=$tip_id");
+        header("Location: ../view/training_tip_details.php?id=$tip_id");
     }
     exit();
 }

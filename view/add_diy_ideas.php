@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,63 +14,135 @@ session_start();
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
+        
+        :root {
+            --dark-blue: #3E3C6E;
+            --pink: #FE979B;
+            --peach: #FEAE97;
+            --light-pink: #F6E8DF;
+            --white: #FFFFFF;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            background-color: #f6e8df;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #3e3c6e;
-            font-family: 'Fredoka One', cursive;
-        }
-        form {
+            background-color: var(--light-pink);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        label {
-            margin-bottom: 5px;
-            color: #3e3c6e;
+
+        .header {
+            background-color: var(--dark-blue);
+            color: var(--white);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        input, textarea {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+
+        .header h1 {
+            font-family: 'Fredoka One', cursive;
+            margin: 0;
         }
-        button {
-            background-color: #fe979b;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            color: var(--dark-blue);
+            font-family: 'Fredoka One', cursive;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: calc(100% - 1.6rem - 4px); /* Adjust for padding and border */
+            padding: 0.8rem;
+            border: 2px solid var(--light-pink);
+            border-radius: 8px;
             font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box; /* Add this */
         }
-        button:hover {
-            background-color: #3e3c6e;
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--peach);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group input[type="file"] {
+            width: calc(100% - 1rem); /* Adjust for padding */
+            padding: 0.5rem;
+            border: 2px dashed var(--peach);
+            border-radius: 8px;
+            background: var(--light-pink);
+            cursor: pointer;
+            box-sizing: border-box; /* Add this */
+        }
+
+        .submit-btn {
+            background: var(--peach);
+            color: var(--white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: var(--pink);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Add DIY Idea</h1>
+    <div class="form-container">
+        <h2>Add New DIY Idea</h2>
         <form action="../actions/add_diy_idea.php" method="POST" enctype="multipart/form-data">
-            <label for="title">Title</label>
-            <input type="text" id="title" name="title" required>
-            <label for="description">Description</label>
-            <textarea id="description" name="description" rows="5" required></textarea>
-            <label for="image">Image</label>
-            <input type="file" id="image" name="image" accept="image/*">
-            <button type="submit">Add DIY Idea</button>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" rows="5" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Image</label>
+                <input type="file" name="image" accept="image/*">
+            </div>
+            
+            <button type="submit" class="submit-btn">Submit DIY Idea</button>
         </form>
     </div>
 </body>
