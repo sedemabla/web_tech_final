@@ -1,3 +1,47 @@
+<?php
+session_start();
+require_once '../db/db.php';
+
+// Add error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Get filter parameters
+$category = isset($_GET['category']) ? $conn->real_escape_string($_GET['category']) : '';
+$search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+
+// Build base query
+$query = "SELECT h.*, u.username, 
+          COUNT(c.comment_id) as comment_count 
+          FROM health_tips h
+          LEFT JOIN users u ON h.created_by = u.user_id
+          LEFT JOIN comments c ON h.tip_id = c.content_id AND c.content_type = 'health_tip'";
+
+// Add WHERE clause if needed
+$where = [];
+if ($category) {
+    $where[] = "h.category = '$category'";
+}
+if ($search) {
+    $where[] = "(h.title LIKE '%$search%' OR h.description LIKE '%$search%')";
+}
+
+if (!empty($where)) {
+    $query .= " WHERE " . implode(' AND ', $where);
+}
+
+$query .= " GROUP BY h.tip_id ORDER BY h.created_at DESC";
+
+try {
+    $result = $conn->query($query);
+    if (!$result) {
+        throw new Exception($conn->error);
+    }
+} catch (Exception $e) {
+    error_log("Query error: " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,39 +139,89 @@
         .tip-card a:hover {
             background-color: #3e3c6e;
         }
+        .filters {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filters select,
+        .filters input {
+            padding: 0.5rem;
+            border: 1px solid var(--peach);
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .filters button {
+            background: var(--peach);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filters button:hover {
+            background: var(--dark-blue);
+        }
     </style>
 </head>
 <body>
     <header>
         <h2>Fur & Friends</h2>
         <nav>
-            <a href="index.html">Home</a>
-            <a href="training_tips.html">Tips & Training</a>
-            <a href="diy_ideas.html">DIY Ideas</a>
-            <a href="health_tips.html">Health Tips</a>
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
+            <a href="index.php">Home</a>
+            <a href="training_tips.php">Training Tips</a>
+            <a href="diy_ideas.php">DIY Ideas</a>
+            <a href="health_tips.php">Health Tips</a>
+            <a href="about.php">About Us</a>
+            <a href="contact.php">Contact</a>
         </nav>
     </header>
 
     <div class="container">
         <h1>Health Tips</h1>
-        <a href="add_health_tips.html" class="add-button">Add Health Tip</a>
+        
+        <?php if(isset($_SESSION['user_id'])): ?>
+            <a href="add_health_tips.php" class="add-button">Add Health Tip</a>
+        <?php endif; ?>
+
+        <div class="filters">
+            <form action="" method="GET">
+                <select name="category">
+                    <option value="">All Categories</option>
+                    <option value="Nutrition" <?= $category == 'Nutrition' ? 'selected' : '' ?>>Nutrition</option>
+                    <option value="Exercise" <?= $category == 'Exercise' ? 'selected' : '' ?>>Exercise</option>
+                    <option value="Medical" <?= $category == 'Medical' ? 'selected' : '' ?>>Medical</option>
+                    <option value="Grooming" <?= $category == 'Grooming' ? 'selected' : '' ?>>Grooming</option>
+                </select>
+                <input type="text" name="search" placeholder="Search tips..." value="<?= htmlspecialchars($search) ?>">
+                <button type="submit">Filter</button>
+            </form>
+        </div>
 
         <div class="tips-grid">
-            <!-- Example Cards -->
-            <div class="tip-card">
-                <img src="assets/healthtipspic.jpg" alt="Dental Hygiene">
-                <h3>Proper Dental Hygiene</h3>
-                <p>Learn how to maintain your pet's dental health to avoid common issues.</p>
-                <a href="health_tips_details.html">Read More</a>
-            </div>
-            <div class="tip-card">
-                <img src="assets/healthtipspic.jpg" alt="Exercise">
-                <h3>Daily Exercise</h3>
-                <p>Simple exercise routines to keep your pets fit and healthy.</p>
-                <a href="health_tips_details.html">Read More</a>
-            </div>
+            <?php if (isset($result) && $result->num_rows > 0): ?>
+                <?php while ($tip = $result->fetch_assoc()): ?>
+                    <div class="tip-card">
+                        <img src="<?= !empty($tip['image_path']) ? 
+                            "../" . htmlspecialchars($tip['image_path']) : 
+                            "../assets/images/placeholder.jpg" ?>" 
+                            alt="<?= htmlspecialchars($tip['title']) ?>"
+                            onerror="this.src='../assets/images/placeholder.jpg'">
+                        <h3><?= htmlspecialchars($tip['title']) ?></h3>
+                        <p><?= htmlspecialchars(substr($tip['description'], 0, 100)) ?>...</p>
+                        <p><strong>Category:</strong> <?= htmlspecialchars($tip['category']) ?></p>
+                        <p><small>By <?= htmlspecialchars($tip['username']) ?></small></p>
+                        <a href="health_tips_details.php?id=<?= $tip['tip_id'] ?>">Read More</a>
+                    </div>
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p>No health tips found.</p>
+            <?php endif; ?>
         </div>
     </div>
 </body>
