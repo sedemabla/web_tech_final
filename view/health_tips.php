@@ -173,7 +173,7 @@ try {
     <header>
         <h2>Fur & Friends</h2>
         <nav>
-            <a href="index.php">Home</a>
+            <a href="../index.php">Home</a>
             <a href="training_tips.php">Training Tips</a>
             <a href="diy_ideas.php">DIY Ideas</a>
             <a href="health_tips.php">Health Tips</a>
