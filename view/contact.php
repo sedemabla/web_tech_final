@@ -167,7 +167,7 @@ session_start(); // Start session for user login management
     </header>
 
     <nav>
-        <a href="index.php">Home</a>
+        <a href="../index.php">Home</a>
         <a href="about.php">About Us</a>
         <a href="contact.php">Contact</a>
         <?php if (isset($_SESSION['user_id'])): ?>

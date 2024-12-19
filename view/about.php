@@ -165,7 +165,7 @@ session_start(); // Start session for user login management or flash messages
     <header>
         <h1>Fur & Friends</h1>
         <nav>
-            <a href="index.php">Home</a>
+            <a href="../index.php">Home</a>
             <a href="contact.php">Contact</a>
             <a href="about.php">About Us</a>
             <a href="signup.php">Sign Up</a>

@@ -190,7 +190,7 @@ try {
     <div class="banner">
         <h1>Fur & Friends</h1>
         <nav>
-            <a href="index.php">Home</a>
+            <a href="../index.php">Home</a>
             <a href="training_tips.php">Training Tips</a>
             <a href="diy_ideas.php">DIY Ideas</a>
             <a href="about.php">About</a>
