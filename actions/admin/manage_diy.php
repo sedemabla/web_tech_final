@@ -63,12 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if ($action === 'add') {
-        $stmt = $conn->prepare("INSERT INTO diy_ideas (title, description, image_path, created_by) VALUES (?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO diy_ideas (title, description, image_url, user_id) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("sssi", $title, $description, $image_path, $_SESSION['user_id']);
     } else {
         $diy_id = (int)$_POST['diy_id'];
         if ($image_path) {
-            $stmt = $conn->prepare("UPDATE diy_ideas SET title = ?, description = ?, image_path = ? WHERE diy_id = ?");
+            $stmt = $conn->prepare("UPDATE diy_ideas SET title = ?, description = ?, image_url = ? WHERE idea_id = ?");
             $stmt->bind_param("sssi", $title, $description, $image_path, $diy_id);
         } else {
             $stmt = $conn->prepare("UPDATE diy_ideas SET title = ?, description = ? WHERE diy_id = ?");

@@ -42,76 +42,104 @@ $comments = $stmt->get_result();
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($idea['title']) ?> - DIY Idea</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/diy_details.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap');
-        
-        :root {
-            --dark-blue: #3E3C6E;
-            --pink: #FE979B;
-            --peach: #FEAE97;
-            --light-pink: #F6E8DF;
-            --white: #FFFFFF;
+        .comments-section {
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
         }
 
-        /* Use same styles as training_tip_details.php */
-        /* ...existing styles from training_tip_details.php... */
+        .comment-form {
+            margin-bottom: 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1rem;
+            border: 2px solid var(--light-pink);
+            border-radius: 8px;
+            margin: 0 0 1rem 0;
+            min-height: 100px;
+            font-family: 'Poppins', sans-serif;
+            resize: vertical;
+        }
+
+        .comment-form button {
+            background: var(--peach);
+            color: var(--white);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        .comment-form button:hover {
+            background-color: var(--dark-blue);
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <a href="diy_ideas.php" class="back-button">
-            <i class='bx bx-arrow-back'></i>
-            Back to DIY Ideas
+            <i class='bx bx-arrow-back'></i> Back to DIY Ideas
         </a>
         <h1>Fur & Friends</h1>
-        <nav>
-            <a href="../index.php">Home</a>
-            <a href="training_tips.php">Training Tips</a>
-            <a href="health_tips.php">Health Tips</a>
-            <a href="about.php">About Us</a>
-        </nav>
     </div>
 
-    <div class="container">
-        <div class="tip-content">
+    <div class="diy-details-container">
+        <div class="diy-content">
             <?php if (!empty($idea['image_url'])): ?>
                 <img src="../uploads/diy/<?= htmlspecialchars($idea['image_url']) ?>" 
                      alt="<?= htmlspecialchars($idea['title']) ?>" 
-                     class="tip-image"
+                     class="diy-image"
                      onerror="this.src='../assets/images/placeholder.jpg'">
             <?php endif; ?>
 
-            <h1 class="tip-title"><?= htmlspecialchars($idea['title']) ?></h1>
-            <p><strong>Created by:</strong> <?= htmlspecialchars($idea['username']) ?></p>
+            <h1><?= htmlspecialchars($idea['title']) ?></h1>
             
-            <div class="tip-description">
+            <div class="diy-meta">
+                <span>By <?= htmlspecialchars($idea['username']) ?></span>
+                <span><?= $idea['comment_count'] ?> comments</span>
+            </div>
+
+            <div class="diy-description">
                 <?= nl2br(htmlspecialchars($idea['description'])) ?>
             </div>
         </div>
 
-        <!-- Comments Section -->
         <div class="comments-section">
             <h2>Comments</h2>
+            
             <?php if (isset($_SESSION['user_id'])): ?>
                 <form class="comment-form" action="../actions/add_comment.php" method="POST">
                     <input type="hidden" name="content_type" value="diy_idea">
                     <input type="hidden" name="content_id" value="<?= $idea_id ?>">
-                    <div>
-                        <label>Comment:</label>
-                        <textarea name="comment" required></textarea>
-                    </div>
-                    <button type="submit">Add Comment</button>
+                    <textarea name="comment" placeholder="Write your comment..." required></textarea>
+                    <button type="submit">Post Comment</button>
                 </form>
             <?php endif; ?>
 
-            <?php while ($comment = $comments->fetch_assoc()): ?>
-                <div class="comment">
-                    <p><?= htmlspecialchars($comment['comment_text']) ?></p>
-                    <small>By <?= htmlspecialchars($comment['username']) ?> on 
-                        <?= date('M d, Y', strtotime($comment['created_at'])) ?></small>
-                </div>
-            <?php endwhile; ?>
+            <div class="comments-list">
+                <?php while ($comment = $comments->fetch_assoc()): ?>
+                    <div class="comment">
+                        <div class="comment-header">
+                            <strong><?= htmlspecialchars($comment['username']) ?></strong>
+                            <small><?= date('M d, Y', strtotime($comment['created_at'])) ?></small>
+                        </div>
+                        <div class="comment-content">
+                            <?= nl2br(htmlspecialchars($comment['comment_text'])) ?>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
+            </div>
         </div>
     </div>
 </body>

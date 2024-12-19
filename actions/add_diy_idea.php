@@ -25,24 +25,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $image_url = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['image']['tmp_name'];
-        $fileName = $_FILES['image']['name'];
-        $fileSize = $_FILES['image']['size'];
-        $fileType = $_FILES['image']['type'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
-
-        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg');
-        if (in_array($fileExtension, $allowedfileExtensions)) {
-            $uploadFileDir = '../../uploads/';
-            $dest_path = $uploadFileDir . $fileName;
-
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                $image_url = $fileName;
-            } else {
-                $errors[] = "There was an error moving the uploaded file.";
-            }
+        $fileName = uniqid() . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+        $uploadDir = '../uploads/diy/';
+        
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        
+        $dest_path = $uploadDir . $fileName;
+        if (move_uploaded_file($fileTmpPath, $dest_path)) {
+            $image_url = $fileName;  // Store just filename
         } else {
-            $errors[] = "Upload failed. Allowed file types: " . implode(',', $allowedfileExtensions);
+            $errors[] = "There was an error moving the uploaded file.";
         }
     }
 

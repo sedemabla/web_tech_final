@@ -208,9 +208,9 @@ try {
             <?php while($diy = $result->fetch_assoc()): ?>
                 <a href="diy_idea_details.php?id=<?= $diy['idea_id'] ?>" class="diy-card">
                     <?php
-                        $image_path = !empty($diy['image_url']) ? 
-                            "../" . $diy['image_url'] : 
-                            "../assets/images/placeholder.jpg";
+                       $image_path = !empty($diy['image_url']) ? 
+                       "../uploads/diy/" . $diy['image_url'] : 
+                       "assets/images/placeholder.jpg";
                     ?>
                     <img src="<?= htmlspecialchars($image_path) ?>" 
                             alt="<?= htmlspecialchars($diy['title']) ?>" 
